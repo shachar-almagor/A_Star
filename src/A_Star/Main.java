@@ -10,8 +10,9 @@ public class Main {
 		frame = new JFrame();
 		Gameplay gameplay = new Gameplay();
 		Settings settings = new Settings(frame);
+		Algorithms algorithms = new Algorithms();
 		
-		Toolbar toolbar = new Toolbar(gameplay, settings);
+		Toolbar toolbar = new Toolbar(gameplay, settings, algorithms);
 		int brickWidth = 800 / gameplay.getTotalRows();
 		int width = (gameplay.getTotalRows() * brickWidth) + 400;
 		frame.pack();

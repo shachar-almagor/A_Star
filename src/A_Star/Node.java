@@ -2,6 +2,7 @@ package A_Star;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import A_Star.Node;
 
@@ -13,6 +14,7 @@ public class Node{
 	private int y;
 	private Color color;
 	private Node[] neighbors;
+	private ArrayList<Node> paintmModeNeighbors;
 	private boolean visited;
 	
 	boolean topWall;
@@ -48,6 +50,7 @@ public class Node{
 
 		this.color = Color.white;
 		this.neighbors = new Node[4];
+		this.paintmModeNeighbors = new ArrayList<Node>();
 
 	}
 
@@ -95,6 +98,10 @@ public class Node{
 
 	public Node[] getNeighbors(){
 		return this.neighbors;
+	}
+	
+	public ArrayList<Node> getPaintModeNeighbors(){
+		return this.paintmModeNeighbors;
 	}
 
 	public boolean getVisited() {
@@ -248,18 +255,38 @@ public class Node{
 		this.neighbors[3] = left;
 	}
 	
-	public void updateNeighbors() {
-		if(this.topWall) {
-			this.neighbors[0] = null;
-		}
-		if(this.rightWall) {
-			this.neighbors[1] = null;
-		}
-		if(this.bottomWall) {
-			this.neighbors[2] = null;
-		}
-		if(this.leftWall) {
-			this.neighbors[3] = null;
+	public void updateNeighbors(Node left, Node down, Node right, Node up, boolean isPaintMode) {
+		if(!isPaintMode) {
+			if(this.topWall) {
+				this.neighbors[0] = null;
+			}
+			if(this.rightWall) {
+				this.neighbors[1] = null;
+			}
+			if(this.bottomWall) {
+				this.neighbors[2] = null;
+			}
+			if(this.leftWall) {
+				this.neighbors[3] = null;
+			}
+		} else {
+			// Paint Mode
+			if(left != null && !(left.isBarrier()) && !(left.isClosed())) {
+				// LEFT
+				this.paintmModeNeighbors.add(left);
+			}
+			if(down != null && !(down.isBarrier()) && !(down.isClosed())) {
+				// DOWN
+				this.paintmModeNeighbors.add(down);
+			}
+			if(right != null && !(right.isBarrier()) && !(right.isClosed())) {
+				// RIGHT
+				this.paintmModeNeighbors.add(right);
+			}
+			if(up != null && !(up.isBarrier()) && !(up.isClosed())) {
+				// UP
+				this.paintmModeNeighbors.add(up);
+			}
 		}
 	}
 

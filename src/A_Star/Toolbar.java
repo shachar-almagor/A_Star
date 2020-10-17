@@ -10,10 +10,12 @@ public class Toolbar extends JPanel implements KeyListener{
 
 	private Gameplay gameplay;
 	private Settings settings;
+	private Algorithms algorithms;
 
-	public Toolbar(Gameplay gameplay, Settings settings) {
+	public Toolbar(Gameplay gameplay, Settings settings, Algorithms algorithms) {
 		this.gameplay = gameplay;
 		this.settings = settings;
+		this.algorithms = algorithms;
 		this.setLayout(new BorderLayout());
 
 		setFocusable(true);
@@ -35,8 +37,17 @@ public class Toolbar extends JPanel implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-		if(key == KeyEvent.VK_SPACE && !gameplay.getCurrent().equals(gameplay.getEnd())) {
-			gameplay.startAlgorithm();
+		if(key == KeyEvent.VK_SPACE && gameplay.getStart() != null && gameplay.getEnd() != null && !gameplay.getCurrent().equals(gameplay.getEnd())) {
+			if(gameplay.getCurrAlgorithm() == "Breadth First Search (BFS)") {
+				algorithms.breadthFirstSearch(gameplay);
+			} else if(gameplay.getCurrAlgorithm() == "Depth First Search (DFS)") {
+				algorithms.depthFirstSearch(gameplay);
+			} else if(gameplay.getCurrAlgorithm() == "Dijkstra") {
+				algorithms.dijkstra(gameplay);
+			} else {
+				// A*
+				gameplay.startAlgorithm();
+			}
 		} else if(gameplay.getStart() != null && gameplay.getEnd() != null) {
 			Node current = gameplay.getCurrent();
 			Node temp = current;
