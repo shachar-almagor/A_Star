@@ -33,8 +33,9 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	private Node end;
 	private Node current;
 	
-	boolean landing;
-	String currAlgorithm;
+	private boolean landing;
+	private String currAlgorithm;
+	private String state;
 
 	private ArrayList<Node[]> grid;
 
@@ -46,7 +47,8 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		setFocusTraversalKeysEnabled(true);
 		makeGrid(totalRows, 800);
 		landing = true;
-		currAlgorithm = "";
+		this.currAlgorithm = "Breadth First Search (BFS)";
+		this.state = "home";
 	}
 
 	public void paint(Graphics g) {
@@ -329,8 +331,32 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		return this.current;
 	}
 	
+	public boolean getStarted() {
+		return this.started;
+	}
+	
 	public void setCurrent(Node current) {
 		this.current = current;
+	}
+	
+	public void setStart(Node start) {
+		this.start = start;
+	}
+	
+	public void setEnd(Node end) {
+		this.end = end;
+	}
+	
+	public String getState() {
+		return this.state;
+	}
+	
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+	public void setStarted(boolean started) {
+		this.started = started;
 	}
 
 	public void setTotalRows(int totalRows) {
@@ -367,12 +393,12 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 
 	public void clearBoard() {
 		if(!started) {
-//			started = false;
+			started = false;
 			start = null;
 			end = null;
 			makeGrid(totalRows, 800);
 		}
-		this.landing = true;
+//		this.landing = true;
 		repaint();
 	}
 
@@ -392,7 +418,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 					} else if(end == null && !clicked.isStart()) {
 						clicked.makeEnd();
 						end = clicked;
-					} else if(clicked != start && clicked != end){
+					} else if(clicked != start && clicked != end && this.state == "paint"){
 						clicked.makeBarrier();
 					}
 				} else if(rightMousePressed){
@@ -434,7 +460,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 					} else if(end == null && !clicked.isStart() && !clicked.isBarrier()) {
 						clicked.makeEnd();
 						end = clicked;
-					} else if(isPaintMode && !clicked.isStart() && !clicked.isEnd()) {
+					} else if(isPaintMode && !clicked.isStart() && !clicked.isEnd() && this.state == "paint") {
 						clicked.makeBarrier();
 					}
 				} else if(e.getButton() == 3) {

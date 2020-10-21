@@ -3,6 +3,7 @@ package A_Star;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Event;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ItemEvent;
@@ -56,13 +57,15 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		algoLabel.setForeground(Color.white);
 		algoLabel.setFont(font);
 		
+		JLabel rowsLabel = new JLabel("Choose Number of Rows: (2 - 50)");
+		rowsLabel.setForeground(Color.white);
+		rowsLabel.setFont(font);
+		
 		JLabel homeLabel = new JLabel("Back to home screen:");
 		homeLabel.setForeground(Color.white);
 		homeLabel.setFont(font);
 
-		JLabel rowsLabel = new JLabel("Choose Number of Rows:");
-		rowsLabel.setForeground(Color.white);
-		rowsLabel.setFont(font);
+
 		
 		algoBox = new JComboBox<String>(algorithms);
 
@@ -135,7 +138,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 
 		this.add(blueLabel, "wrap");
 		this.add(orangeLabel, "wrap");
-		
+				
 		this.add(homeLabel, "wrap");
 		this.add(homeBtn, "wrap");
 		//		this.add(description2, "wrap");
@@ -151,6 +154,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		if(e.getSource() == zigzagBtn) {
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
+			gameplay.setState("zigzag");
 
 			gameplay.clearBoard();
 			gameplay.setLanding(false);
@@ -163,6 +167,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == spiralBtn){
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
+			gameplay.setState("spiral");
 
 			gameplay.clearBoard();
 			gameplay.setLanding(false);
@@ -183,7 +188,8 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == randomMazeBtn) {
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
-			
+			gameplay.setState("random");
+
 			gameplay.setLanding(false);
 			gameplay.setIsPaintMode(false);
 
@@ -224,6 +230,9 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == paintModeBtn) {
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			Toolbar t = (Toolbar) this.getParent();
+			
+			gameplay.setState("paint");
+
 			t.grabFocus();
 			gameplay.clearBoard();
 			gameplay.setLanding(false);
@@ -232,8 +241,17 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == homeBtn) {
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			Toolbar t = (Toolbar) this.getParent();
+			gameplay.setState("home");
+
 			t.grabFocus();
-			gameplay.clearBoard();
+			if(!gameplay.getStarted()) {
+				gameplay.setStarted(false);
+				gameplay.setStart(null);
+				gameplay.setEnd(null);
+				gameplay.makeGrid(gameplay.getTotalRows(), 800);
+			}
+			gameplay.setLanding(true);
+			gameplay.repaint();
 			gameplay.setIsPaintMode(false);
 		}
 	}

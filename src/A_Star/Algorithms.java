@@ -8,6 +8,7 @@ public class Algorithms {
 
 	public boolean breadthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);
+		gameplay.setStarted(true);
 		LinkedList<Node> queue = new LinkedList<Node>();
 		Node start = gameplay.getStart();
 		start.setVisited(true);
@@ -25,6 +26,7 @@ public class Algorithms {
 			if(current.equals(gameplay.getEnd())) {
 				// Reconstruct path
 				gameplay.reconstruct_path(gameplay.getEnd());
+				gameplay.setStarted(false);
 				return true;
 			}
 
@@ -69,6 +71,7 @@ public class Algorithms {
 	public void depthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);		
 		this.ended = false;
+		gameplay.setStarted(true);
 		Node start = gameplay.getStart();
 		start.setVisited(true);
 		depthFirstSearchRec(gameplay, start, ended);
@@ -87,6 +90,7 @@ public class Algorithms {
 		if(current.equals(gameplay.getEnd())) {
 			gameplay.getEnd().setVisited(true);
 			gameplay.reconstruct_path(gameplay.getEnd());
+			gameplay.setStarted(false);
 			this.ended = true;
 			return;
 		}
