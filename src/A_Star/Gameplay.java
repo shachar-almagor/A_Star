@@ -244,17 +244,15 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 								open_set_hash.add(neighbor);
 								neighbor.makeOpen();
 								neighbor.draw(g);
-//								drawGridLines(totalRows, brickWidth, g);
 							}
 						}
 					}
-					if(!current.equals(start)) {
-						current.makeClosed();
-						open_set.remove(current);
-						open_set_hash.remove(current);
-						current.draw(g);
-//						drawGridLines(totalRows, brickWidth, g);
-					}
+				}
+				if(!current.equals(start)) {
+					current.makeClosed();
+					open_set.remove(current);
+					open_set_hash.remove(current);
+					current.draw(g);
 				}
 			} else {
 				for(int i = 0; i < current.getNeighbors().length; i++) {
@@ -281,13 +279,13 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 							}
 						}
 					}
-					if(!current.equals(start)) {
-						current.makeClosed();
-						open_set.remove(current);
-						open_set_hash.remove(current);
-						current.draw(g);
-						current.drawLines(g);
-					}
+				}
+				if(!current.equals(start)) {
+					current.makeClosed();
+					open_set.remove(current);
+					open_set_hash.remove(current);
+					current.draw(g);
+					current.drawLines(g);
 				}
 			}
 		}

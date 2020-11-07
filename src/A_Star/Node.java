@@ -26,8 +26,8 @@ public class Node{
 	private int count;
 	private double f_score;
 	private double g_score;
+	private double distance;
 	private Node cameFrom;
-
 
 	private int width;
 	private int totalRows;
@@ -41,6 +41,7 @@ public class Node{
 		this.y = (row * width);
 		this.f_score = Double.POSITIVE_INFINITY;
 		this.g_score = Double.POSITIVE_INFINITY;
+		this.distance = Double.POSITIVE_INFINITY;
 		this.cameFrom = null;
 		this.visited = false;
 		this.topWall = true;
@@ -79,6 +80,10 @@ public class Node{
 	public double get_g_score() {
 		return this.g_score;
 	}
+	
+	public double getDistance() {
+		return this.distance;
+	}
 
 	public Node getCameFrom() {
 		return this.cameFrom;
@@ -115,6 +120,10 @@ public class Node{
 
 	public void set_g_score(double newScore) {
 		this.g_score = newScore;
+	}
+	
+	public void setDistance(double distance) {
+		this.distance = distance;
 	}
 
 	public void set_came_From(Node current) {

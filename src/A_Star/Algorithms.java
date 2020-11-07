@@ -1,7 +1,10 @@
 package A_Star;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
+
 
 public class Algorithms {
 	boolean ended = false;
@@ -84,9 +87,9 @@ public class Algorithms {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		if(this.ended) return;
-		
+
 		if(current.equals(gameplay.getEnd())) {
 			gameplay.getEnd().setVisited(true);
 			gameplay.reconstruct_path(gameplay.getEnd());
@@ -135,8 +138,66 @@ public class Algorithms {
 		}
 	}
 
-	public void dijkstra(Gameplay gameplay) {
+	public void dijkstra(Gameplay gameplay) throws InterruptedException {
 		initAlgorithm(gameplay);
+		int count = 0;
+		PriorityQueue<Node> unvisited_set = new PriorityQueue<Node>(5, new DistanceComparator());
+		HashSet<Node> visited_set = new HashSet<Node>();
+
+		Node current = gameplay.getStart();
+		current.setDistance(0);
+
+		makeUnvisited(gameplay, unvisited_set);
+
+		while(!unvisited_set.isEmpty()) {
+//			TimeUnit.NANOSECONDS.sleep(1);
+			current = getCurrent(unvisited_set);
+			unvisited_set.remove(current);
+			current.setVisited(true);
+			visited_set.add(current);
+
+			if(gameplay.getIsPaintMode()) {
+				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
+					Node neighbor = current.getPaintModeNeighbors().get(i);
+
+					if(neighbor != null && !neighbor.getVisited()) {
+						double temp = 1 + current.getDistance();
+						if(temp < neighbor.getDistance()) {
+							neighbor.setDistance(temp);
+							neighbor.set_came_From(current);
+						}
+					}
+				}
+				if(!current.isStart() && !current.isEnd()) {
+					current.makeClosed();
+					current.draw(gameplay.getGraphics());
+					current.drawLines(gameplay.getGraphics());
+				}
+
+			} else {
+				for(int i = 0; i < current.getNeighbors().length; i++) {
+					Node neighbor = current.getNeighbors()[i];
+
+					if(neighbor != null && !neighbor.getVisited()) {
+						double temp = 1 + current.getDistance();
+						if(temp < neighbor.getDistance()) {
+							neighbor.setDistance(temp);
+							neighbor.set_came_From(current);
+						}
+					}
+				}
+				if(!current.isStart() && !current.isEnd()) {
+					current.makeClosed();
+					current.draw(gameplay.getGraphics());
+					current.drawLines(gameplay.getGraphics());
+				}
+			}	
+		}
+
+		gameplay.reconstruct_path(gameplay.getEnd());
+		gameplay.getEnd().makeEnd();
+		gameplay.getStart().makeStart();
+		gameplay.setStarted(false);
 	}
 
 	public void initAlgorithm(Gameplay gameplay) {
@@ -156,6 +217,32 @@ public class Algorithms {
 				curr.setVisited(false);
 			}
 		}
+	}
+
+	public void makeUnvisited(Gameplay gameplay, PriorityQueue<Node> unvisited_set) {
+		for(int i = 0; i < gameplay.getTotalRows(); i++) {
+			for(int j = 0; j < gameplay.getTotalRows(); j++) {
+				Node curr = gameplay.getGrid().get(i)[j];
+				if(curr != null && !curr.isBarrier()) {
+					unvisited_set.add(curr);
+					curr.setVisited(false);
+				}
+			}
+		}
+	}
+
+	public Node getCurrent(PriorityQueue<Node> unvisited_set) {
+		Node minNode = null;
+		for (Node node : unvisited_set) {
+			if(minNode != null) {
+				if(node.getDistance() < minNode.getDistance()) {
+					minNode = node;
+				}
+			} else {
+				minNode = node;
+			}
+		}
+		return minNode;
 	}
 
 

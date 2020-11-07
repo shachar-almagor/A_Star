@@ -43,7 +43,12 @@ public class Toolbar extends JPanel implements KeyListener{
 			} else if(gameplay.getCurrAlgorithm() == "Depth First Search (DFS)") {
 				algorithms.depthFirstSearch(gameplay);
 			} else if(gameplay.getCurrAlgorithm() == "Dijkstra") {
-				algorithms.dijkstra(gameplay);
+				try {
+					algorithms.dijkstra(gameplay);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			} else {
 				// A*
 				gameplay.startAlgorithm();
