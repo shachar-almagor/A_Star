@@ -17,7 +17,7 @@ public class Main {
 		int width = (gameplay.getTotalRows() * brickWidth) + 400;
 		frame.pack();
 		frame.setBounds(10, 10, width, 835);
-		frame.setTitle("A* Path Finding Algorithm Visualizer");
+		frame.setTitle("Path Finding Algorithms Visualizer");
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

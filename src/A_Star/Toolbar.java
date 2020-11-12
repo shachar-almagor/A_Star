@@ -1,6 +1,7 @@
 package A_Star;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -24,7 +25,6 @@ public class Toolbar extends JPanel implements KeyListener{
 		this.add(gameplay, BorderLayout.CENTER);
 		this.add(settings, BorderLayout.WEST);
 		addKeyListener(this);
-
 	}
 
 	public Gameplay getGameplay() {
@@ -38,11 +38,11 @@ public class Toolbar extends JPanel implements KeyListener{
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		if(key == KeyEvent.VK_SPACE && gameplay.getStart() != null && gameplay.getEnd() != null && !gameplay.getCurrent().equals(gameplay.getEnd())) {
-			if(gameplay.getCurrAlgorithm() == "Breadth First Search (BFS)") {
+			if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.BreadthFirstSearch) {
 				algorithms.breadthFirstSearch(gameplay);
-			} else if(gameplay.getCurrAlgorithm() == "Depth First Search (DFS)") {
+			} else if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.DepthFirstSearch) {
 				algorithms.depthFirstSearch(gameplay);
-			} else if(gameplay.getCurrAlgorithm() == "Dijkstra") {
+			} else if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.Dijkstra) {
 				try {
 					algorithms.dijkstra(gameplay);
 				} catch (InterruptedException e1) {
@@ -79,10 +79,11 @@ public class Toolbar extends JPanel implements KeyListener{
 				if(!current.equals(gameplay.getStart()) && !current.equals(gameplay.getEnd())) {
 					current.makeOpen();
 				}
-				temp.draw(gameplay.getGraphics());
-				current.draw(gameplay.getGraphics());
-				temp.drawLines(gameplay.getGraphics());
-				current.drawLines(gameplay.getGraphics());
+				Graphics graphics = gameplay.getGraphics();
+				temp.draw(graphics);
+				current.draw(graphics);
+				temp.drawLines(graphics);
+				current.drawLines(graphics);
 			}
 		} 
 	}

@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Event;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Paint;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -39,6 +40,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	private JSpinner numRowsPicker;
 	private JComboBox<String> algoBox;
 	private JFrame frame;
+
 	private String[] algorithms = {"Breadth First Search (BFS)", "Depth First Search (DFS)", "Dijkstra", "A* (A star)"}; 
 
 	private MazeGenerator mazeGenerator;
@@ -65,8 +67,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		homeLabel.setForeground(Color.white);
 		homeLabel.setFont(font);
 
-
-		
 		algoBox = new JComboBox<String>(algorithms);
 
 		JLabel blueLabel = new JLabel("Blue = Start");
@@ -74,15 +74,8 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		JLabel orangeLabel = new JLabel("Orange = End");
 		orangeLabel.setForeground(Color.orange);
 
-		JLabel description2 = new JLabel("using the left mouse button. Use the");
-		JLabel description3 = new JLabel("right mouse button to delete your painting");
-		description2.setForeground(Color.white);
-		description3.setForeground(Color.white);
-
 		blueLabel.setFont(font);
 		orangeLabel.setFont(font);
-		description2.setFont(font);
-		description3.setFont(font);
 
 		zigzagBtn = new JButton("Zigzag");
 		spiralBtn = new JButton("Spiral");
@@ -101,7 +94,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		jftf.setColumns(3);
 		numRowsPicker.setFont(font);	
 		((DefaultEditor) mySpinnerEditor).getTextField().setHorizontalAlignment(JTextField.CENTER);
-        //
 		
 		algoBox.setFont(font);
 
@@ -131,8 +123,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		this.add(algoLabel, "wrap");
 		this.add(algoBox, "wrap");
 		
-
-
 		this.add(rowsLabel, "wrap");
 		this.add(numRowsPicker, "span");
 
@@ -141,8 +131,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 				
 		this.add(homeLabel, "wrap");
 		this.add(homeBtn, "wrap");
-		//		this.add(description2, "wrap");
-		//		this.add(description3, "wrap");
 
 
 		this.setBackground(Color.DARK_GRAY);
@@ -151,26 +139,23 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
+		Toolbar t = (Toolbar) this.getParent();
 		if(e.getSource() == zigzagBtn) {
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
-			gameplay.setState("zigzag");
+			gameplay.setState(State.Zigzag);
 
 			gameplay.clearBoard();
-			gameplay.setLanding(false);
 			gameplay.setIsPaintMode(false);
 
 			mazeGenerator.makeZigzag();
-			Toolbar t = (Toolbar) this.getParent();
 			t.grabFocus();
 			gameplay.repaint();
 		} else if(e.getSource() == spiralBtn){
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
-			gameplay.setState("spiral");
+			gameplay.setState(State.Spiral);
 
 			gameplay.clearBoard();
-			gameplay.setLanding(false);
 			gameplay.setIsPaintMode(false);
 
 			for(int i = 0; i < gameplay.getTotalRows(); i++) {
@@ -182,15 +167,12 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 			gameplay.repaint();
 
 			mazeGenerator.makeSpiral(gameplay.getGrid().get(0)[0], 1);
-			Toolbar t = (Toolbar) this.getParent();
 			t.grabFocus();
 			gameplay.repaint();		
 		} else if(e.getSource() == randomMazeBtn) {
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
-			gameplay.setState("random");
+			gameplay.setState(State.random);
 
-			gameplay.setLanding(false);
 			gameplay.setIsPaintMode(false);
 
 			gameplay.clearBoard();
@@ -219,29 +201,22 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 			path.push(current);
 
 			try {
-				gameplay.setLanding(false);
 				mazeGenerator.makeRandomMaze(current, path, unvisited_set_hash, gameplay, g);
-				Toolbar t = (Toolbar) this.getParent();
 				t.grabFocus();
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
 
 		} else if(e.getSource() == paintModeBtn) {
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
-			Toolbar t = (Toolbar) this.getParent();
 			
-			gameplay.setState("paint");
+			gameplay.setState(State.Paint);
 
 			t.grabFocus();
 			gameplay.clearBoard();
-			gameplay.setLanding(false);
 			gameplay.setIsPaintMode(true);
 
 		} else if(e.getSource() == homeBtn) {
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
-			Toolbar t = (Toolbar) this.getParent();
-			gameplay.setState("home");
+			gameplay.setState(State.Home);
 
 			t.grabFocus();
 			if(!gameplay.getStarted()) {
@@ -250,7 +225,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 				gameplay.setEnd(null);
 				gameplay.makeGrid(gameplay.getTotalRows(), 800);
 			}
-			gameplay.setLanding(true);
 			gameplay.repaint();
 			gameplay.setIsPaintMode(false);
 		}
@@ -275,7 +249,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 						
 		gameplay.setTotalRows(value);
 		gameplay.makeGrid(value, 800);
-		if(!gameplay.getLanding()) {
+		if(!(gameplay.getState() == State.Paint)) {
 			gameplay.drawGrid(value, 800, gameplay.getGraphics());
 			gameplay.drawGridLines(value, 800, gameplay.getGraphics());
 		}
@@ -293,8 +267,22 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	public void itemStateChanged(ItemEvent e) {
 		if(e.getSource() == algoBox) {
 			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
-			
-			gameplay.setCurrAlgorithm((String) algoBox.getSelectedItem());
+			switch((String) algoBox.getSelectedItem()) {
+				case("Breadth First Search (BFS)"):
+					gameplay.setCurrAlgorithm(CurrentAlgorithm.BreadthFirstSearch);
+					break;
+				case("Depth First Search (DFS)"):
+					gameplay.setCurrAlgorithm(CurrentAlgorithm.DepthFirstSearch);
+					break;
+
+				case("Dijkstra"):
+					gameplay.setCurrAlgorithm(CurrentAlgorithm.Dijkstra);
+					break;
+
+				case("A* (A star)"):
+					gameplay.setCurrAlgorithm(CurrentAlgorithm.A_Star);
+					break;
+			}
 		}
 	}
 }

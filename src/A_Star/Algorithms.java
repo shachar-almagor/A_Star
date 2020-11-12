@@ -1,5 +1,6 @@
 package A_Star;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -7,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Algorithms {
-	boolean ended = false;
 
 	public boolean breadthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);
@@ -36,112 +36,105 @@ public class Algorithms {
 			if(gameplay.getIsPaintMode()) {
 				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
 					Node neighbor = current.getPaintModeNeighbors().get(i);
-
-					if(neighbor != null && !neighbor.getVisited()) {
-						neighbor.setVisited(true);
-						neighbor.set_came_From(current);
-						queue.add(neighbor);
-						if(!neighbor.equals(gameplay.getEnd())) {
-							neighbor.makeClosed();
-							neighbor.draw(gameplay.getGraphics());
-							neighbor.drawLines(gameplay.getGraphics());
-						}
-					}
+					markNeighborBFS(current, neighbor, queue, gameplay);
 				}
 			} else {
-
 				for(int i = 0; i < current.getNeighbors().length; i++) {
 					Node neighbor = current.getNeighbors()[i];
-
-					if(neighbor != null && !neighbor.getVisited()) {
-						neighbor.setVisited(true);
-						neighbor.set_came_From(current);
-						queue.add(neighbor);
-						if(!neighbor.equals(gameplay.getEnd())) {
-							neighbor.makeClosed();
-							neighbor.draw(gameplay.getGraphics());
-							neighbor.drawLines(gameplay.getGraphics());
-						}
-					}
+					markNeighborBFS(current, neighbor, queue, gameplay);
 				}
 			}
 		}
-
-
 		return false;
+	}
+	
+	public void markNeighborBFS(Node current, Node neighbor, LinkedList<Node> queue, Gameplay gameplay) {
+		if(neighbor != null && !neighbor.getVisited()) {
+			neighbor.setVisited(true);
+			neighbor.set_came_From(current);
+			queue.add(neighbor);
+			if(!neighbor.equals(gameplay.getEnd())) {
+				neighbor.makeClosed();
+				neighbor.draw(gameplay.getGraphics());
+				neighbor.drawLines(gameplay.getGraphics());
+			}
+		}
 	}
 
 	public void depthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);		
-		this.ended = false;
 		gameplay.setStarted(true);
 		Node start = gameplay.getStart();
 		start.setVisited(true);
-		depthFirstSearchRec(gameplay, start, ended);
+		depthFirstSearchRec(gameplay, start);
 	}
 
-	public void depthFirstSearchRec(Gameplay gameplay, Node current, boolean ended) {
+	public void depthFirstSearchRec(Gameplay gameplay, Node current) {
 		try {
 			// Make this controlled by user (5 - fast, 50 - medium, 200 - slow)
 			TimeUnit.MILLISECONDS.sleep(5);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		if(this.ended) return;
+		
+		if(!gameplay.getStarted()) return;
 
 		if(current.equals(gameplay.getEnd())) {
 			gameplay.getEnd().setVisited(true);
 			gameplay.reconstruct_path(gameplay.getEnd());
 			gameplay.setStarted(false);
-			this.ended = true;
 			return;
 		}
 		if(!current.equals(gameplay.getEnd())) {
 			if(gameplay.getIsPaintMode()) {
 				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
 					Node neighbor = current.getPaintModeNeighbors().get(i);
-					if(neighbor != null && !neighbor.getVisited() && !this.ended) {
-						neighbor.setVisited(true);
-						neighbor.set_came_From(current);
-						if(!neighbor.equals(gameplay.getEnd()) && !this.ended) {
-							neighbor.makeClosed();
-							neighbor.draw(gameplay.getGraphics());
-							neighbor.drawLines(gameplay.getGraphics());
-							depthFirstSearchRec(gameplay, neighbor, this.ended);
-						} else {
-							depthFirstSearchRec(gameplay, neighbor, this.ended);
-							this.ended = true;
-							break;
-						}
-					}
+					markNeighborDFS(current, neighbor, gameplay);
 				}
 			} else {
 				for(int i = 0; i < current.getNeighbors().length; i++) {
 					Node neighbor = current.getNeighbors()[i];
-					if(neighbor != null && !neighbor.getVisited() && !this.ended) {
-						neighbor.setVisited(true);
-						neighbor.set_came_From(current);
-						if(!neighbor.equals(gameplay.getEnd()) && !neighbor.equals(gameplay.getStart())) {
-							neighbor.makeClosed();
-							neighbor.draw(gameplay.getGraphics());
-							neighbor.drawLines(gameplay.getGraphics());
-							depthFirstSearchRec(gameplay, neighbor, this.ended);
-						} else {
-							depthFirstSearchRec(gameplay, neighbor, this.ended);
-							this.ended = true;
-							break;
-						}
-					}
+					markNeighborDFS(current, neighbor, gameplay);
 				}
 			}
+		}
+	}
+	
+	public void markNeighborDFS(Node current, Node neighbor, Gameplay gameplay) {
+		if(neighbor != null && !neighbor.getVisited() && gameplay.getStarted()) {
+			neighbor.setVisited(true);
+			neighbor.set_came_From(current);
+			if(!neighbor.equals(gameplay.getEnd()) && !neighbor.equals(gameplay.getStart())) {
+				neighbor.makeClosed();
+				neighbor.draw(gameplay.getGraphics());
+				neighbor.drawLines(gameplay.getGraphics());
+			} 
+			depthFirstSearchRec(gameplay, neighbor);
 		}
 	}
 
 	public void dijkstra(Gameplay gameplay) throws InterruptedException {
 		initAlgorithm(gameplay);
 		int count = 0;
-		PriorityQueue<Node> unvisited_set = new PriorityQueue<Node>(5, new DistanceComparator());
+		PriorityQueue<Node> unvisited_set = new PriorityQueue<Node>(5, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				if(o1.getDistance() < o2.getDistance()) {
+					return -1;
+				} else if(o2.getDistance() < o1.getDistance()) {
+					return 1;
+				} else {
+					// The two nodes have identical distances
+					if(o1.getCount() <= o2.getCount()) {
+						return -1;
+					} else if(o2.getCount() < o1.getCount()) {
+						return 1;
+					}
+				}
+				// Compilation requirement
+				return 0;
+			}
+		});
 		HashSet<Node> visited_set = new HashSet<Node>();
 
 		Node current = gameplay.getStart();
@@ -150,46 +143,27 @@ public class Algorithms {
 		makeUnvisited(gameplay, unvisited_set);
 
 		while(!unvisited_set.isEmpty()) {
-//			TimeUnit.NANOSECONDS.sleep(1);
 			current = getCurrent(unvisited_set);
 			unvisited_set.remove(current);
 			current.setVisited(true);
 			visited_set.add(current);
+			current.setCount(count++);
+			
+			if(!current.isStart() && !current.isEnd()) {
+				current.makeClosed();
+				current.draw(gameplay.getGraphics());
+				current.drawLines(gameplay.getGraphics());
+			}
 
 			if(gameplay.getIsPaintMode()) {
 				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
 					Node neighbor = current.getPaintModeNeighbors().get(i);
-
-					if(neighbor != null && !neighbor.getVisited()) {
-						double temp = 1 + current.getDistance();
-						if(temp < neighbor.getDistance()) {
-							neighbor.setDistance(temp);
-							neighbor.set_came_From(current);
-						}
-					}
+					markNeighborDijkstra(current, neighbor, gameplay);
 				}
-				if(!current.isStart() && !current.isEnd()) {
-					current.makeClosed();
-					current.draw(gameplay.getGraphics());
-					current.drawLines(gameplay.getGraphics());
-				}
-
 			} else {
 				for(int i = 0; i < current.getNeighbors().length; i++) {
 					Node neighbor = current.getNeighbors()[i];
-
-					if(neighbor != null && !neighbor.getVisited()) {
-						double temp = 1 + current.getDistance();
-						if(temp < neighbor.getDistance()) {
-							neighbor.setDistance(temp);
-							neighbor.set_came_From(current);
-						}
-					}
-				}
-				if(!current.isStart() && !current.isEnd()) {
-					current.makeClosed();
-					current.draw(gameplay.getGraphics());
-					current.drawLines(gameplay.getGraphics());
+					markNeighborDijkstra(current, neighbor, gameplay);
 				}
 			}	
 		}
@@ -198,6 +172,16 @@ public class Algorithms {
 		gameplay.getEnd().makeEnd();
 		gameplay.getStart().makeStart();
 		gameplay.setStarted(false);
+	}
+	
+	public void markNeighborDijkstra(Node current, Node neighbor, Gameplay gameplay) {
+		if(neighbor != null && !neighbor.getVisited()) {
+			double temp = 1 + current.getDistance();
+			if(temp < neighbor.getDistance()) {
+				neighbor.setDistance(temp);
+				neighbor.set_came_From(current);
+			}
+		}
 	}
 
 	public void initAlgorithm(Gameplay gameplay) {
@@ -213,7 +197,7 @@ public class Algorithms {
 				Node bottom = curr.getRow() < curr.getTotalRows() - 1 ? gameplay.getGrid().get(i + 1)[j] : null;
 				Node left = curr.getCol() > 0 ? gameplay.getGrid().get(i)[j - 1] : null;
 
-				curr.updateNeighbors(top, right, bottom, left, isPaintMode);
+				curr.updateNeighbors(top, right, bottom, left, gameplay);
 				curr.setVisited(false);
 			}
 		}
@@ -244,6 +228,4 @@ public class Algorithms {
 		}
 		return minNode;
 	}
-
-
 }
