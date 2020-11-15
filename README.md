@@ -12,9 +12,9 @@ This mode allows you to draw your own maze by adding and deleting barriers (Blac
 ![Alt Text](resources/paint_mode.gif)
 
 ## The Algorithms
-[Breadth First Search (BFS)](https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/)
-[Depth First Search (DFS)](https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/)
-[Dijkstra](https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/)
+[Breadth First Search (BFS)](https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/)  
+[Depth First Search (DFS)](https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/)  
+[Dijkstra](https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/)  
 [A* (A Star)](https://www.geeksforgeeks.org/a-search-algorithm/)
 
 
