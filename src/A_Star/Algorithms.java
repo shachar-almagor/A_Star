@@ -139,15 +139,15 @@ public class Algorithms {
 
 		Node current = gameplay.getStart();
 		current.setDistance(0);
+		current.setCount(count++);
+		unvisited_set.add(current);
 
 		makeUnvisited(gameplay, unvisited_set);
 
 		while(!unvisited_set.isEmpty()) {
-			current = getCurrent(unvisited_set);
-			unvisited_set.remove(current);
+			current = unvisited_set.poll();
 			current.setVisited(true);
 			visited_set.add(current);
-			current.setCount(count++);
 			
 			if(!current.isStart() && !current.isEnd()) {
 				current.makeClosed();
@@ -158,12 +158,12 @@ public class Algorithms {
 			if(gameplay.getIsPaintMode()) {
 				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
 					Node neighbor = current.getPaintModeNeighbors().get(i);
-					markNeighborDijkstra(current, neighbor, gameplay);
+					markNeighborDijkstra(current, neighbor, gameplay, unvisited_set, count);
 				}
 			} else {
 				for(int i = 0; i < current.getNeighbors().length; i++) {
 					Node neighbor = current.getNeighbors()[i];
-					markNeighborDijkstra(current, neighbor, gameplay);
+					markNeighborDijkstra(current, neighbor, gameplay, unvisited_set, count);
 				}
 			}	
 		}
@@ -174,12 +174,14 @@ public class Algorithms {
 		gameplay.setStarted(false);
 	}
 	
-	public void markNeighborDijkstra(Node current, Node neighbor, Gameplay gameplay) {
+	public void markNeighborDijkstra(Node current, Node neighbor, Gameplay gameplay, PriorityQueue<Node> unvisited_set, int count) {
 		if(neighbor != null && !neighbor.getVisited()) {
 			double temp = 1 + current.getDistance();
 			if(temp < neighbor.getDistance()) {
+				unvisited_set.add(neighbor);
 				neighbor.setDistance(temp);
 				neighbor.set_came_From(current);
+				neighbor.setCount(count++);
 			}
 		}
 	}
@@ -208,24 +210,9 @@ public class Algorithms {
 			for(int j = 0; j < gameplay.getTotalRows(); j++) {
 				Node curr = gameplay.getGrid().get(i)[j];
 				if(curr != null && !curr.isBarrier()) {
-					unvisited_set.add(curr);
 					curr.setVisited(false);
 				}
 			}
 		}
-	}
-
-	public Node getCurrent(PriorityQueue<Node> unvisited_set) {
-		Node minNode = null;
-		for (Node node : unvisited_set) {
-			if(minNode != null) {
-				if(node.getDistance() < minNode.getDistance()) {
-					minNode = node;
-				}
-			} else {
-				minNode = node;
-			}
-		}
-		return minNode;
 	}
 }

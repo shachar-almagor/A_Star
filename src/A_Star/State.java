@@ -4,6 +4,6 @@ public enum State {
 	Home,
 	Zigzag,
 	Spiral,
-	random,
+	Random,
 	Paint
 }

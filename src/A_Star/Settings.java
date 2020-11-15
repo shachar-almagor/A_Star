@@ -171,7 +171,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 			gameplay.repaint();		
 		} else if(e.getSource() == randomMazeBtn) {
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
-			gameplay.setState(State.random);
+			gameplay.setState(State.Random);
 
 			gameplay.setIsPaintMode(false);
 
