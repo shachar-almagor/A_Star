@@ -41,11 +41,11 @@ public class Algorithms {
 	}
 	
 	public void markNeighborBFS(Node current, Node neighbor, LinkedList<Node> queue, Gameplay gameplay) {
-		if(neighbor != null && !neighbor.getVisited()) {
+		if(neighbor != null && !neighbor.getVisited() && !neighbor.isBarrier()) {
 			neighbor.setVisited(true);
 			neighbor.set_came_From(current);
 			queue.add(neighbor);
-			if(!neighbor.equals(gameplay.getEnd())) {
+			if(!neighbor.isEnd()) {
 				neighbor.makeClosed();
 				neighbor.draw(gameplay.getGraphics());
 				neighbor.drawLines(gameplay.getGraphics());
@@ -89,7 +89,7 @@ public class Algorithms {
 	public void markNeighborDFS(Node current, Node neighbor, Gameplay gameplay) {
 		if(this.ended) return;
 
-		if(neighbor != null && !neighbor.getVisited() && gameplay.getStarted()) {
+		if(neighbor != null && !neighbor.getVisited() && gameplay.getStarted() && !neighbor.isBarrier()) {
 			neighbor.setVisited(true);
 			neighbor.set_came_From(current);
 			if(!neighbor.equals(gameplay.getEnd()) && !neighbor.equals(gameplay.getStart())) {

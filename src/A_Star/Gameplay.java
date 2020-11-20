@@ -226,7 +226,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 				start.makeStart();
 				break;
 			}
-			if(!current.isStart()) {
+			if(!current.isStart() && !current.isBarrier()) {
 				current.makeClosed();
 				open_set.remove(current);
 				open_set_hash.remove(current);
@@ -241,7 +241,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	}
 
 	public void markNeighborAStar(Node current, Node neighbor, PriorityQueue<Node> open_set, HashSet<Node> open_set_hash) {
-		if(neighbor != null && !neighbor.isClosed()) {
+		if(neighbor != null && !neighbor.isClosed() && !neighbor.isBarrier()) {
 			// If the node is closed, disregard it
 			double temp_g_score = current.get_g_score() + 1;
 			if(temp_g_score < neighbor.get_g_score()) {
