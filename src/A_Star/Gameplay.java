@@ -27,10 +27,12 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	private int totalRows = 50;
 	private int brickWidth;
 	private int count = 0;
+	private int delay = 0;
 
 	private Node start;
 	private Node end;
 	private Node current;
+	private Speed speed;
 
 	private CurrentAlgorithm currentAlgorithm;
 	private State state;
@@ -46,6 +48,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		makeGrid(totalRows, 800);
 		this.currentAlgorithm = CurrentAlgorithm.BreadthFirstSearch;
 		this.state = State.Home;
+		this.speed = Speed.Fast;
 	}
 
 	public void paint(Graphics g) {
@@ -82,6 +85,10 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 
 	public CurrentAlgorithm getCurrAlgorithm() {
 		return this.currentAlgorithm;
+	}
+	
+	public Speed getSpeed() {
+		return this.speed;
 	}
 
 	public void makeGrid(int rows, int width) {
@@ -210,8 +217,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 
 		while(!open_set.isEmpty()) {
 			try {
-				// Make this controlled by user (5 - fast, 50 - medium, 200 - slow)
-				TimeUnit.MILLISECONDS.sleep(5);
+				TimeUnit.MICROSECONDS.sleep(this.delay);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -270,7 +276,11 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 			reconstruct_path(current.getCameFrom());
 			if(!current.equals(start) && !current.equals(end)) {
 				try {
-					TimeUnit.MILLISECONDS.sleep(5);
+					if(this.currentAlgorithm == CurrentAlgorithm.Dijkstra) {
+						TimeUnit.MICROSECONDS.sleep(this.delay / 5);
+					} else {
+						TimeUnit.MICROSECONDS.sleep(this.delay);
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -338,6 +348,18 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 
 	public void setCurrAlgorithm(CurrentAlgorithm currentAlgorithm) {
 		this.currentAlgorithm = currentAlgorithm;
+	}
+	
+	public void setSpeed(Speed speed) {
+		this.speed = speed;
+	}
+	
+	public int getDelay() {
+		return this.delay;
+	}
+	
+	public void setDelay(int delay) {
+		this.delay = delay;
 	}
 
 	public void moveUp() {

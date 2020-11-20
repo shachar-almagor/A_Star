@@ -40,10 +40,11 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	private JButton resetBtn;
 	private JSpinner numRowsPicker;
 	private JComboBox<String> algoBox;
+	private JComboBox<String> speedBox;
 	private JFrame frame;
 
 	private String[] algorithms = {"Breadth First Search (BFS)", "Depth First Search (DFS)", "Dijkstra", "A* (A star)"}; 
-
+	private String[] speeds = {"Fast", "Medium", "Slow"};
 	private MazeGenerator mazeGenerator;
 
 	public Settings(JFrame frame) {
@@ -55,20 +56,25 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		JLabel mazeLabel = new JLabel("Choose Maze:");
 		mazeLabel.setForeground(Color.white);
 		mazeLabel.setFont(font);
-		
+
 		JLabel algoLabel = new JLabel("Choose Algorithm:");
 		algoLabel.setForeground(Color.white);
 		algoLabel.setFont(font);
-		
+
+		JLabel speedLabel = new JLabel("Choose Algorithm Speed:");
+		speedLabel.setForeground(Color.white);
+		speedLabel.setFont(font);
+
 		JLabel rowsLabel = new JLabel("Choose Number of Rows: (2 - 50)");
 		rowsLabel.setForeground(Color.white);
 		rowsLabel.setFont(font);
-		
+
 		JLabel homeLabel = new JLabel("Back to home screen:");
 		homeLabel.setForeground(Color.white);
 		homeLabel.setFont(font);
 
 		algoBox = new JComboBox<String>(algorithms);
+		speedBox = new JComboBox<String>(speeds);
 
 		JLabel blueLabel = new JLabel("Blue = Start");
 		blueLabel.setForeground(Color.blue);
@@ -84,20 +90,20 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		paintModeBtn = new JButton("Paint Mode");
 		homeBtn = new JButton("Home");
 		resetBtn = new JButton("Reset");
-		
+
 		// Spinner setup
 		numRowsPicker = new JSpinner(new SpinnerNumberModel(50, 2, 50, 1));
-		
-		
+
 		Component mySpinnerEditor = numRowsPicker.getEditor();
-		
+
 		JFormattedTextField jftf = ((JSpinner.DefaultEditor) mySpinnerEditor).getTextField();
-		
+
 		jftf.setColumns(3);
 		numRowsPicker.setFont(font);	
 		((DefaultEditor) mySpinnerEditor).getTextField().setHorizontalAlignment(JTextField.CENTER);
-		
+
 		algoBox.setFont(font);
+		speedBox.setFont(font);
 
 		numRowsPicker.addChangeListener(this);
 
@@ -106,6 +112,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		randomMazeBtn.addMouseListener(this);
 		paintModeBtn.addMouseListener(this);
 		algoBox.addItemListener(this);
+		speedBox.addItemListener(this);
 		homeBtn.addMouseListener(this);
 		resetBtn.addMouseListener(this);
 
@@ -114,6 +121,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		randomMazeBtn.setFocusable(false);
 		paintModeBtn.setFocusable(false);
 		algoBox.setFocusable(false);
+		speedBox.setFocusable(false);
 		homeBtn.setFocusable(false);
 		resetBtn.setFocusable(false);
 		numRowsPicker.setFocusable(false);
@@ -123,16 +131,19 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		this.add(spiralBtn);
 		this.add(randomMazeBtn);
 		this.add(paintModeBtn, "wrap");
-		
+
 		this.add(algoLabel, "wrap");
 		this.add(algoBox, "wrap");
-		
+
+		this.add(speedLabel, "wrap");
+		this.add(speedBox, "wrap");
+
 		this.add(rowsLabel, "wrap");
 		this.add(numRowsPicker, "span");
 
 		this.add(blueLabel, "wrap");
 		this.add(orangeLabel, "wrap");
-				
+
 		this.add(homeLabel, "wrap");
 		this.add(homeBtn, "split");
 		this.add(resetBtn);
@@ -168,7 +179,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 					gameplay.getGrid().get(i)[j].makeBarrier();
 				}
 			}
-			
+
 			gameplay.repaint();
 
 			mazeGenerator.makeSpiral(gameplay.getGrid().get(0)[0], 1);
@@ -212,7 +223,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 			}
 
 		} else if(e.getSource() == paintModeBtn) {
-			
+
 			gameplay.setState(State.Paint);
 			gameplay.setStarted(false);
 
@@ -256,7 +267,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	public void stateChanged(ChangeEvent e) {
 		int value = (int) numRowsPicker.getValue();
 		Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
-						
+
 		gameplay.setTotalRows(value);
 		gameplay.makeGrid(value, 800);
 		if(!(gameplay.getState() == State.Paint)) {
@@ -275,23 +286,39 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
+		Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 		if(e.getSource() == algoBox) {
-			Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
 			switch((String) algoBox.getSelectedItem()) {
-				case("Breadth First Search (BFS)"):
-					gameplay.setCurrAlgorithm(CurrentAlgorithm.BreadthFirstSearch);
-					break;
-				case("Depth First Search (DFS)"):
-					gameplay.setCurrAlgorithm(CurrentAlgorithm.DepthFirstSearch);
-					break;
+			case("Breadth First Search (BFS)"):
+				gameplay.setCurrAlgorithm(CurrentAlgorithm.BreadthFirstSearch);
+			break;
+			case("Depth First Search (DFS)"):
+				gameplay.setCurrAlgorithm(CurrentAlgorithm.DepthFirstSearch);
+			break;
 
-				case("Dijkstra"):
-					gameplay.setCurrAlgorithm(CurrentAlgorithm.Dijkstra);
-					break;
+			case("Dijkstra"):
+				gameplay.setCurrAlgorithm(CurrentAlgorithm.Dijkstra);
+			break;
 
-				case("A* (A star)"):
-					gameplay.setCurrAlgorithm(CurrentAlgorithm.A_Star);
-					break;
+			case("A* (A star)"):
+				gameplay.setCurrAlgorithm(CurrentAlgorithm.A_Star);
+			break;
+			}
+		} else if(e.getSource() == speedBox) {
+			switch((String) speedBox.getSelectedItem()) {
+			case("Fast"):
+				gameplay.setDelay(100);
+				gameplay.setSpeed(Speed.Fast);
+			break;
+			case("Medium"):
+				gameplay.setDelay(1000);
+				gameplay.setSpeed(Speed.Medium);
+			break;
+
+			case("Slow"):
+				gameplay.setDelay(5000);
+				gameplay.setSpeed(Speed.Slow);
+			break;
 			}
 		}
 	}

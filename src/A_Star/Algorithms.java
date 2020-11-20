@@ -8,10 +8,11 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Algorithms {
-	boolean ended = false;
+	private boolean ended = false;
 
 	public boolean breadthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);
+
 		gameplay.setStarted(true);
 		LinkedList<Node> queue = new LinkedList<Node>();
 		Node start = gameplay.getStart();
@@ -20,8 +21,7 @@ public class Algorithms {
 
 		while(!queue.isEmpty()) {
 			try {
-				// Make this controlled by user (5 - fast, 50 - medium, 200 - slow)
-				TimeUnit.MILLISECONDS.sleep(5);
+				TimeUnit.MICROSECONDS.sleep(gameplay.getDelay());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -63,8 +63,7 @@ public class Algorithms {
 
 	public void depthFirstSearchRec(Gameplay gameplay, Node current) {
 		try {
-			// Make this controlled by user (5 - fast, 50 - medium, 200 - slow)
-			TimeUnit.MILLISECONDS.sleep(5);
+			TimeUnit.MICROSECONDS.sleep(gameplay.getDelay() * 3);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -136,6 +135,11 @@ public class Algorithms {
 		current.setDistance(0);
 
 		while(!unvisited_set.isEmpty()) {
+			try {
+				TimeUnit.MICROSECONDS.sleep(gameplay.getDelay() / 5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			current = unvisited_set.poll();
 			current.setVisited(true);
 			visited_set.add(current);
@@ -206,4 +210,6 @@ public class Algorithms {
 	public void setEnded(boolean ended) {
 		this.ended = ended;
 	}
+	
+
 }
