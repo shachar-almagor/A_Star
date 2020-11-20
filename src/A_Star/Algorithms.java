@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Algorithms {
+	boolean ended = false;
 
 	public boolean breadthFirstSearch(Gameplay gameplay) {
 		initAlgorithm(gameplay);
@@ -29,20 +30,11 @@ public class Algorithms {
 			if(current.equals(gameplay.getEnd())) {
 				// Reconstruct path
 				gameplay.reconstruct_path(gameplay.getEnd());
-				gameplay.setStarted(false);
 				return true;
 			}
-
-			if(gameplay.getIsPaintMode()) {
-				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
-					Node neighbor = current.getPaintModeNeighbors().get(i);
-					markNeighborBFS(current, neighbor, queue, gameplay);
-				}
-			} else {
-				for(int i = 0; i < current.getNeighbors().length; i++) {
-					Node neighbor = current.getNeighbors()[i];
-					markNeighborBFS(current, neighbor, queue, gameplay);
-				}
+			for(int i = 0; i < current.getNeighbors().length; i++) {
+				Node neighbor = gameplay.getState() == State.Paint ? current.getPaintModeNeighbors()[i] : current.getNeighbors()[i];
+				markNeighborBFS(current, neighbor, queue, gameplay);
 			}
 		}
 		return false;
@@ -76,31 +68,27 @@ public class Algorithms {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		if(!gameplay.getStarted()) return;
+		if(this.ended) return;
 
 		if(current.equals(gameplay.getEnd())) {
 			gameplay.getEnd().setVisited(true);
 			gameplay.reconstruct_path(gameplay.getEnd());
-			gameplay.setStarted(false);
+			ended = true;
 			return;
 		}
+
 		if(!current.equals(gameplay.getEnd())) {
-			if(gameplay.getIsPaintMode()) {
-				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
-					Node neighbor = current.getPaintModeNeighbors().get(i);
-					markNeighborDFS(current, neighbor, gameplay);
-				}
-			} else {
-				for(int i = 0; i < current.getNeighbors().length; i++) {
-					Node neighbor = current.getNeighbors()[i];
-					markNeighborDFS(current, neighbor, gameplay);
-				}
+			for(int i = 0; i < current.getNeighbors().length; i++) {
+				Node neighbor = gameplay.getState() == State.Paint ? current.getPaintModeNeighbors()[i] : current.getNeighbors()[i];
+				markNeighborDFS(current, neighbor, gameplay);
 			}
 		}
+
 	}
 	
 	public void markNeighborDFS(Node current, Node neighbor, Gameplay gameplay) {
+		if(this.ended) return;
+
 		if(neighbor != null && !neighbor.getVisited() && gameplay.getStarted()) {
 			neighbor.setVisited(true);
 			neighbor.set_came_From(current);
@@ -114,7 +102,10 @@ public class Algorithms {
 	}
 
 	public void dijkstra(Gameplay gameplay) throws InterruptedException {
+		
 		initAlgorithm(gameplay);
+		
+		gameplay.setStarted(true);
 		int count = 0;
 		PriorityQueue<Node> unvisited_set = new PriorityQueue<Node>(5, new Comparator<Node>() {
 			@Override
@@ -138,40 +129,32 @@ public class Algorithms {
 		HashSet<Node> visited_set = new HashSet<Node>();
 
 		Node current = gameplay.getStart();
-		current.setDistance(0);
 		current.setCount(count++);
 		unvisited_set.add(current);
 
 		makeUnvisited(gameplay, unvisited_set);
+		current.setDistance(0);
 
 		while(!unvisited_set.isEmpty()) {
 			current = unvisited_set.poll();
 			current.setVisited(true);
 			visited_set.add(current);
-			
+						
 			if(!current.isStart() && !current.isEnd()) {
 				current.makeClosed();
 				current.draw(gameplay.getGraphics());
 				current.drawLines(gameplay.getGraphics());
 			}
-
-			if(gameplay.getIsPaintMode()) {
-				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
-					Node neighbor = current.getPaintModeNeighbors().get(i);
-					markNeighborDijkstra(current, neighbor, gameplay, unvisited_set, count);
-				}
-			} else {
-				for(int i = 0; i < current.getNeighbors().length; i++) {
-					Node neighbor = current.getNeighbors()[i];
-					markNeighborDijkstra(current, neighbor, gameplay, unvisited_set, count);
-				}
-			}	
+			
+			for(int i = 0; i < current.getNeighbors().length; i++) {
+				Node neighbor = gameplay.getState() == State.Paint ? current.getPaintModeNeighbors()[i] : current.getNeighbors()[i];
+				markNeighborDijkstra(current, neighbor, gameplay, unvisited_set, count);
+			}
 		}
 
 		gameplay.reconstruct_path(gameplay.getEnd());
 		gameplay.getEnd().makeEnd();
 		gameplay.getStart().makeStart();
-		gameplay.setStarted(false);
 	}
 	
 	public void markNeighborDijkstra(Node current, Node neighbor, Gameplay gameplay, PriorityQueue<Node> unvisited_set, int count) {
@@ -187,7 +170,6 @@ public class Algorithms {
 	}
 
 	public void initAlgorithm(Gameplay gameplay) {
-		boolean isPaintMode = gameplay.getIsPaintMode();
 		// Start algorithm
 		for(int i = 0; i < gameplay.getTotalRows(); i++) {
 			for(int j = 0; j < gameplay.getTotalRows(); j++) {
@@ -211,8 +193,17 @@ public class Algorithms {
 				Node curr = gameplay.getGrid().get(i)[j];
 				if(curr != null && !curr.isBarrier()) {
 					curr.setVisited(false);
+					curr.setDistance(Double.POSITIVE_INFINITY);
 				}
 			}
 		}
+	}
+	
+	public boolean getEnded() {
+		return this.ended;
+	}
+	
+	public void setEnded(boolean ended) {
+		this.ended = ended;
 	}
 }

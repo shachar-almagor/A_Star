@@ -31,7 +31,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	private Node start;
 	private Node end;
 	private Node current;
-	
+
 	private CurrentAlgorithm currentAlgorithm;
 	private State state;
 
@@ -52,7 +52,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		// Background
 		g.setColor(Color.white);
 		g.fillRect(1, 1, 792, 792);
-		
+
 		if(getState() == State.Home) {
 			// Draw landing page
 			drawLandingPage(g);
@@ -79,13 +79,9 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	public ArrayList<Node[]> getGrid(){
 		return this.grid;
 	}
-	
+
 	public CurrentAlgorithm getCurrAlgorithm() {
 		return this.currentAlgorithm;
-	}
-	
-	public boolean getIsPaintMode() {
-		return isPaintMode;
 	}
 
 	public void makeGrid(int rows, int width) {
@@ -136,7 +132,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 			}
 		}
 	}
-	
+
 	public void drawLandingPage(Graphics g) {
 		g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
 		int midHeight = this.getHeight() / 2;
@@ -157,13 +153,15 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 				for(int j = 0; j < totalRows; j++) {
 
 					Node curr = grid.get(i)[j];
-					
+
 					Node top = curr.getRow() > 0 ? grid.get(i - 1)[j] : null;
 					Node right = curr.getCol() < curr.getTotalRows() - 1 ? grid.get(i)[j + 1] : null;
 					Node bottom = curr.getRow() < curr.getTotalRows() - 1 ? grid.get(i + 1)[j] : null;
 					Node left = curr.getCol() > 0 ? grid.get(i)[j - 1] : null;
 
 					curr.updateNeighbors(top, right, bottom, left, this);
+					curr.set_f_score(Double.POSITIVE_INFINITY);
+					curr.set_g_score(Double.POSITIVE_INFINITY);
 				}
 			}
 			Graphics g = this.getGraphics();
@@ -221,41 +219,30 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 			Node current = open_set.poll();
 			open_set_hash.remove(current);
 
-			if(current.equals(end)) {
+			if(current.isEnd()) {
+				// Algorithm done
 				reconstruct_path(end);
 				end.makeEnd();
 				start.makeStart();
-				// Algorithm done
-				started = false;
 				break;
 			}
-			if(!current.equals(start)) {
+			if(!current.isStart()) {
 				current.makeClosed();
 				open_set.remove(current);
 				open_set_hash.remove(current);
 				current.draw(g);
 				current.drawLines(g);
 			}
-			if(getState() == State.Paint) {
-				for(int i = 0; i < current.getPaintModeNeighbors().size(); i++) {
-					Node neighbor = current.getPaintModeNeighbors().get(i);
-					markNeighborAStar(current, neighbor, open_set, open_set_hash);
-				}
-
-			} else {
-				for(int i = 0; i < current.getNeighbors().length; i++) {
-					Node neighbor = current.getNeighbors()[i];
-					markNeighborAStar(current, neighbor, open_set, open_set_hash);
-				}
-
+			for(int i = 0; i < current.getNeighbors().length; i++) {
+				Node neighbor = this.getState() == State.Paint ? current.getPaintModeNeighbors()[i] : current.getNeighbors()[i];
+				markNeighborAStar(current, neighbor, open_set, open_set_hash);
 			}
 		}
 	}
-	
+
 	public void markNeighborAStar(Node current, Node neighbor, PriorityQueue<Node> open_set, HashSet<Node> open_set_hash) {
 		if(neighbor != null && !neighbor.isClosed()) {
 			// If the node is closed, disregard it
-
 			double temp_g_score = current.get_g_score() + 1;
 			if(temp_g_score < neighbor.get_g_score()) {
 				neighbor.set_came_From(current);
@@ -267,7 +254,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 					neighbor.setCount(count);
 					open_set.add(neighbor);
 					open_set_hash.add(neighbor);
-					if(!neighbor.equals(end)) {
+					if(!neighbor.isEnd()) {
 						neighbor.makeOpen();
 						neighbor.drawLines(getGraphics());
 						neighbor.draw(getGraphics());
@@ -278,21 +265,23 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	}
 
 	public void reconstruct_path(Node current) {
-		while(current.getCameFrom() != null) {
-			try {
-				TimeUnit.MILLISECONDS.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			current = current.getCameFrom();
+
+		if(current.getCameFrom() != null) {
+			reconstruct_path(current.getCameFrom());
 			if(!current.equals(start) && !current.equals(end)) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(5);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				current.makePath();
 				Graphics g = this.getGraphics();
 				current.draw(g);
 				current.drawLines(g);
 			}
+		} else {
+			this.current = this.end;
 		}
-		this.current = this.end;
 	}
 
 	public Node getClickedNode(int x, int y) {
@@ -310,35 +299,35 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 			return null;
 		}
 	}
-	
+
 	public Node getCurrent() {
 		return this.current;
 	}
-	
+
 	public boolean getStarted() {
 		return this.started;
 	}
-	
+
 	public void setCurrent(Node current) {
 		this.current = current;
 	}
-	
+
 	public void setStart(Node start) {
 		this.start = start;
 	}
-	
+
 	public void setEnd(Node end) {
 		this.end = end;
 	}
-	
+
 	public State getState() {
 		return this.state;
 	}
-	
+
 	public void setState(State state) {
 		this.state = state;
 	}
-	
+
 	public void setStarted(boolean started) {
 		this.started = started;
 	}
@@ -346,39 +335,47 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	public void setTotalRows(int totalRows) {
 		this.totalRows = totalRows;
 	}
-	
+
 	public void setCurrAlgorithm(CurrentAlgorithm currentAlgorithm) {
 		this.currentAlgorithm = currentAlgorithm;
 	}
-	
-	public void setIsPaintMode(boolean isPaintMode){
-		this.isPaintMode = isPaintMode;
-	}
-	
+
 	public void moveUp() {
 		current = this.grid.get(current.getRow() - 1)[current.getCol()];
 	}
-	
+
 	public void moveRight() {
 		current = this.grid.get(current.getRow())[current.getCol() + 1];
 	}
-	
+
 	public void moveDown() {
 		current = this.grid.get(current.getRow() + 1)[current.getCol()];
 	}
-	
+
 	public void moveLeft() {
 		current = this.grid.get(current.getRow())[current.getCol() - 1];
 	}
 
 	public void clearBoard() {
-		if(!started) {
-			started = false;
+		if(!this.started) {
 			start = null;
 			end = null;
 			makeGrid(totalRows, 800);
 		}
 		repaint();
+	}
+
+	public void reset() {
+		if(this.started) {
+			this.started = false;
+			for(Node[] nodeRow : this.grid) {
+				for(Node node : nodeRow) {
+					if(!node.isStart() && !node.isEnd() && !node.isBarrier()) {
+						node.reset();
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -423,7 +420,6 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 	public void mousePressed(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
-
 		if(!started) {
 			Node clicked = getClickedNode(x, y);
 

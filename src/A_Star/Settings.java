@@ -37,6 +37,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	private JButton randomMazeBtn;
 	private JButton paintModeBtn;
 	private JButton homeBtn;
+	private JButton resetBtn;
 	private JSpinner numRowsPicker;
 	private JComboBox<String> algoBox;
 	private JFrame frame;
@@ -82,6 +83,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		randomMazeBtn = new JButton("Random Maze");
 		paintModeBtn = new JButton("Paint Mode");
 		homeBtn = new JButton("Home");
+		resetBtn = new JButton("Reset");
 		
 		// Spinner setup
 		numRowsPicker = new JSpinner(new SpinnerNumberModel(50, 2, 50, 1));
@@ -105,6 +107,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		paintModeBtn.addMouseListener(this);
 		algoBox.addItemListener(this);
 		homeBtn.addMouseListener(this);
+		resetBtn.addMouseListener(this);
 
 		zigzagBtn.setFocusable(false);
 		spiralBtn.setFocusable(false);
@@ -112,6 +115,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		paintModeBtn.setFocusable(false);
 		algoBox.setFocusable(false);
 		homeBtn.setFocusable(false);
+		resetBtn.setFocusable(false);
 		numRowsPicker.setFocusable(false);
 
 		this.add(mazeLabel, "wrap");
@@ -130,7 +134,8 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		this.add(orangeLabel, "wrap");
 				
 		this.add(homeLabel, "wrap");
-		this.add(homeBtn, "wrap");
+		this.add(homeBtn, "split");
+		this.add(resetBtn);
 
 
 		this.setBackground(Color.DARK_GRAY);
@@ -144,9 +149,9 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		if(e.getSource() == zigzagBtn) {
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
 			gameplay.setState(State.Zigzag);
+			gameplay.setStarted(false);
 
 			gameplay.clearBoard();
-			gameplay.setIsPaintMode(false);
 
 			mazeGenerator.makeZigzag();
 			t.grabFocus();
@@ -154,9 +159,9 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == spiralBtn){
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
 			gameplay.setState(State.Spiral);
+			gameplay.setStarted(false);
 
 			gameplay.clearBoard();
-			gameplay.setIsPaintMode(false);
 
 			for(int i = 0; i < gameplay.getTotalRows(); i++) {
 				for(int j = 0; j < gameplay.getTotalRows(); j++) {
@@ -172,8 +177,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == randomMazeBtn) {
 			mazeGenerator = new MazeGenerator(gameplay, gameplay.getTotalRows());
 			gameplay.setState(State.Random);
-
-			gameplay.setIsPaintMode(false);
+			gameplay.setStarted(false);
 
 			gameplay.clearBoard();
 
@@ -210,23 +214,29 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == paintModeBtn) {
 			
 			gameplay.setState(State.Paint);
+			gameplay.setStarted(false);
 
 			t.grabFocus();
 			gameplay.clearBoard();
-			gameplay.setIsPaintMode(true);
 
 		} else if(e.getSource() == homeBtn) {
 			gameplay.setState(State.Home);
+			gameplay.setStarted(false);
 
 			t.grabFocus();
 			if(!gameplay.getStarted()) {
-				gameplay.setStarted(false);
 				gameplay.setStart(null);
 				gameplay.setEnd(null);
 				gameplay.makeGrid(gameplay.getTotalRows(), 800);
 			}
 			gameplay.repaint();
-			gameplay.setIsPaintMode(false);
+		} else if(e.getSource() == resetBtn) {
+
+			t.grabFocus();
+			if(gameplay.getStarted()) {
+				gameplay.reset();
+				gameplay.repaint();
+			}
 		}
 	}
 

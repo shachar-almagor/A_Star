@@ -13,9 +13,9 @@ public class Node{
 	private int y;
 	private Color color;
 	private Node[] neighbors;
-	private ArrayList<Node> paintmModeNeighbors;
+	private Node[] paintModeNeighbors;
 	private boolean visited;
-	
+
 	boolean topWall;
 	boolean rightWall;
 	boolean bottomWall;
@@ -49,7 +49,7 @@ public class Node{
 
 		this.color = Color.white;
 		this.neighbors = new Node[4];
-		this.paintmModeNeighbors = new ArrayList<Node>();
+		this.paintModeNeighbors = new Node[4];
 	}
 
 	// GETTERS
@@ -77,7 +77,7 @@ public class Node{
 	public double get_g_score() {
 		return this.g_score;
 	}
-	
+
 	public double getDistance() {
 		return this.distance;
 	}
@@ -101,9 +101,9 @@ public class Node{
 	public Node[] getNeighbors(){
 		return this.neighbors;
 	}
-	
-	public ArrayList<Node> getPaintModeNeighbors(){
-		return this.paintmModeNeighbors;
+
+	public Node[] getPaintModeNeighbors() {
+		return this.paintModeNeighbors;
 	}
 
 	public boolean getVisited() {
@@ -118,7 +118,7 @@ public class Node{
 	public void set_g_score(double newScore) {
 		this.g_score = newScore;
 	}
-	
+
 	public void setDistance(double distance) {
 		this.distance = distance;
 	}
@@ -151,12 +151,12 @@ public class Node{
 		// is the current node the unique end node
 		return this.color == Color.orange;
 	}
-	
+
 	public boolean isBarrier() {
 		// is the current node a barrier
 		return this.color == Color.black;
 	}
-	
+
 
 	public void reset() {
 		// Reset this node color to white
@@ -187,7 +187,7 @@ public class Node{
 		// Change this node's color to orange
 		this.color = Color.orange;
 	}
-	
+
 	public void makeBarrier() {
 		// Change this node's color to black
 		this.color = Color.black;
@@ -196,19 +196,19 @@ public class Node{
 	public void setTopWall(boolean toDraw) {
 		this.topWall = toDraw;
 	}
-	
+
 	public void setRightWall(boolean toDraw) {
 		this.rightWall = toDraw;
 	}
-	
+
 	public void setBottomWall(boolean toDraw) {
 		this.bottomWall = toDraw;
 	}
-	
+
 	public void setLeftWall(boolean toDraw) {
 		this.leftWall = toDraw;
 	}
-	
+
 	public void setVisited(boolean visited) {
 		this.visited = visited;
 	}
@@ -260,40 +260,43 @@ public class Node{
 		this.neighbors[2] = bottom;
 		this.neighbors[3] = left;
 	}
-	
-	public void updateNeighbors(Node left, Node down, Node right, Node up, Gameplay gameplay) {
+
+	public void updateNeighbors(Node top, Node right, Node bottom, Node left, Gameplay gameplay) {
 		switch(gameplay.getState().toString()){
-			case("Paint"):
-				// Paint Mode
-				if(left != null && !(left.isBarrier()) && !(left.isClosed())) {
-					// LEFT
-					this.paintmModeNeighbors.add(left);
-				}
-				if(down != null && !(down.isBarrier()) && !(down.isClosed())) {
-					// DOWN
-					this.paintmModeNeighbors.add(down);
-				}
-				if(right != null && !(right.isBarrier()) && !(right.isClosed())) {
-					// RIGHT
-					this.paintmModeNeighbors.add(right);
-				}
-				if(up != null && !(up.isBarrier()) && !(up.isClosed())) {
-					// UP
-					this.paintmModeNeighbors.add(up);
-				}
-			default:
-				if(this.topWall) {
-					this.neighbors[0] = null;
-				}
-				if(this.rightWall) {
-					this.neighbors[1] = null;
-				}
-				if(this.bottomWall) {
-					this.neighbors[2] = null;
-				}
-				if(this.leftWall) {
-					this.neighbors[3] = null;
-				}
+		case("Paint"):
+			// Paint Mode
+			if(top != null && !(top.isBarrier()) && !(top.isClosed())) {
+				// TOP
+				this.paintModeNeighbors[0] = top;
+			}
+			if(right != null && !(right.isBarrier()) && !(right.isClosed())) {
+				// RIGHT
+				this.paintModeNeighbors[1] = right;
+			}
+			if(bottom != null && !(bottom.isBarrier()) && !(bottom.isClosed())) {
+				// BOTTOM
+				this.paintModeNeighbors[2] = bottom;
+			}
+			if(left != null && !(left.isBarrier()) && !(left.isClosed())) {
+				// LEFT
+				this.paintModeNeighbors[3] = left;
+			}
+
+
+
+		default:
+			if(this.topWall) {
+				this.neighbors[0] = null;
+			}
+			if(this.rightWall) {
+				this.neighbors[1] = null;
+			}
+			if(this.bottomWall) {
+				this.neighbors[2] = null;
+			}
+			if(this.leftWall) {
+				this.neighbors[3] = null;
+			}
 		}
 	}
 

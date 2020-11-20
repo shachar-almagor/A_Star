@@ -37,11 +37,12 @@ public class Toolbar extends JPanel implements KeyListener{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
-		if(key == KeyEvent.VK_SPACE && gameplay.getStart() != null && gameplay.getEnd() != null && !gameplay.getCurrent().equals(gameplay.getEnd())) {
+		if(key == KeyEvent.VK_SPACE && gameplay.getStart() != null && gameplay.getEnd() != null && !gameplay.getStarted()) {
 			if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.BreadthFirstSearch) {
 				algorithms.breadthFirstSearch(gameplay);
 			} else if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.DepthFirstSearch) {
 				algorithms.depthFirstSearch(gameplay);
+				algorithms.setEnded(false);
 			} else if(gameplay.getCurrAlgorithm() == CurrentAlgorithm.Dijkstra) {
 				try {
 					algorithms.dijkstra(gameplay);
@@ -56,7 +57,7 @@ public class Toolbar extends JPanel implements KeyListener{
 		} else if(gameplay.getStart() != null && gameplay.getEnd() != null) {
 			Node current = gameplay.getCurrent();
 			Node temp = current;
-			if(!current.equals(gameplay.getEnd())) {
+			if(!current.isEnd()) {
 				// The user hasn't finished the maze
 				// FIX - MAKE MOVING INSTANTANEOUS
 				if(key == KeyEvent.VK_UP && !current.topWall && current.getRow() > 0) {
@@ -73,10 +74,10 @@ public class Toolbar extends JPanel implements KeyListener{
 					gameplay.moveLeft();
 				}
 				current = gameplay.getCurrent();
-				if(!temp.equals(gameplay.getStart()) && !temp.equals(gameplay.getEnd())) {
+				if(!temp.isStart() && !temp.isEnd()) {
 					temp.makePath();
 				}
-				if(!current.equals(gameplay.getStart()) && !current.equals(gameplay.getEnd())) {
+				if(!current.isStart() && !current.isEnd()) {
 					current.makeOpen();
 				}
 				Graphics graphics = gameplay.getGraphics();
