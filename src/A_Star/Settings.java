@@ -69,10 +69,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		rowsLabel.setForeground(Color.white);
 		rowsLabel.setFont(font);
 
-		JLabel homeLabel = new JLabel("Back to home screen:");
-		homeLabel.setForeground(Color.white);
-		homeLabel.setFont(font);
-
 		algoBox = new JComboBox<String>(algorithms);
 		speedBox = new JComboBox<String>(speeds);
 
@@ -144,7 +140,6 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		this.add(blueLabel, "wrap");
 		this.add(orangeLabel, "wrap");
 
-		this.add(homeLabel, "wrap");
 		this.add(homeBtn, "split");
 		this.add(resetBtn);
 
