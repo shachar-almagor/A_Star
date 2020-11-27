@@ -2,11 +2,8 @@ package A_Star;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Event;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Paint;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -32,6 +29,7 @@ import net.miginfocom.swing.MigLayout;
 
 public class Settings extends JPanel implements MouseListener, ChangeListener, ItemListener{
 
+	private static final long serialVersionUID = 1L;
 	private JButton zigzagBtn;
 	private JButton spiralBtn;
 	private JButton randomMazeBtn;
@@ -72,12 +70,12 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		algoBox = new JComboBox<String>(algorithms);
 		speedBox = new JComboBox<String>(speeds);
 
-		JLabel blueLabel = new JLabel("Blue = Start");
-		blueLabel.setForeground(Color.blue);
+		JLabel cyanLabel = new JLabel("Cyan = Start");
+		cyanLabel.setForeground(Color.cyan);
 		JLabel orangeLabel = new JLabel("Orange = End");
 		orangeLabel.setForeground(Color.orange);
 
-		blueLabel.setFont(font);
+		cyanLabel.setFont(font);
 		orangeLabel.setFont(font);
 
 		zigzagBtn = new JButton("Zigzag");
@@ -137,7 +135,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		this.add(rowsLabel, "wrap");
 		this.add(numRowsPicker, "span");
 
-		this.add(blueLabel, "wrap");
+		this.add(cyanLabel, "wrap");
 		this.add(orangeLabel, "wrap");
 
 		this.add(homeBtn, "split");
@@ -188,12 +186,12 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 			gameplay.clearBoard();
 
 			gameplay.getGrid().get(0)[0].setVisited(true);
-			HashSet<Node> unvisited_set_hash = new HashSet<Node>();
+			HashSet<Node> unvisitedSetHash = new HashSet<Node>();
 
 			for(int i = 0; i < gameplay.getTotalRows(); i++) {
 				for(int j = 0; j < gameplay.getTotalRows(); j++) {
 					// Adding all of the nodes to the unvisited set
-					unvisited_set_hash.add(gameplay.getGrid().get(i)[j]);
+					unvisitedSetHash.add(gameplay.getGrid().get(i)[j]);
 					gameplay.getGrid().get(i)[j].makeBarrier();
 					gameplay.getGrid().get(i)[j].draw(gameplay.getGraphics());
 				}
@@ -204,14 +202,14 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 
 			Stack<Node> path = new Stack<Node>();
 			current.setVisited(true);
-			unvisited_set_hash.remove(current);
+			unvisitedSetHash.remove(current);
 			current.makeStart();
 			current.draw(g);
 			current.drawLines(g);
 			path.push(current);
 
 			try {
-				mazeGenerator.makeRandomMaze(current, path, unvisited_set_hash, gameplay, g);
+				mazeGenerator.makeRandomMaze(current, path, unvisitedSetHash, gameplay, g);
 				t.grabFocus();
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
@@ -282,6 +280,7 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 	@Override
 	public void itemStateChanged(ItemEvent e) {
 		Gameplay gameplay = ((Toolbar) this.getParent()).getGameplay();
+		Algorithms algs =  ((Toolbar) this.getParent()).getAlgortihms();
 		if(e.getSource() == algoBox) {
 			switch((String) algoBox.getSelectedItem()) {
 			case("Breadth First Search (BFS)"):
@@ -302,16 +301,16 @@ public class Settings extends JPanel implements MouseListener, ChangeListener, I
 		} else if(e.getSource() == speedBox) {
 			switch((String) speedBox.getSelectedItem()) {
 			case("Fast"):
-				gameplay.setDelay(100);
+				algs.setDelay(1000);
 				gameplay.setSpeed(Speed.Fast);
 			break;
 			case("Medium"):
-				gameplay.setDelay(1000);
+				algs.setDelay(5000);
 				gameplay.setSpeed(Speed.Medium);
 			break;
 
 			case("Slow"):
-				gameplay.setDelay(5000);
+				algs.setDelay(10000);
 				gameplay.setSpeed(Speed.Slow);
 			break;
 			}

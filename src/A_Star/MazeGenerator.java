@@ -135,36 +135,36 @@ public class MazeGenerator {
 		}
 	}
 
-	public void makeRandomMaze(Node current, Stack<Node> path, HashSet<Node> unvisited_set_hash, Gameplay gameplay, Graphics g) throws InterruptedException {
-		while(!unvisited_set_hash.isEmpty()) {
+	public void makeRandomMaze(Node current, Stack<Node> path, HashSet<Node> unvisitedSetHash, Gameplay gameplay, Graphics g) throws InterruptedException {
+		while(!unvisitedSetHash.isEmpty()) {
 			// While there are unvisited cells
 			Node top = current.getNeighbors()[0];
 			Node right = current.getNeighbors()[1];
 			Node bottom = current.getNeighbors()[2];
 			Node left = current.getNeighbors()[3];
 
-			ArrayList<Node> unvisited_neighbors = new ArrayList<Node>();
+			ArrayList<Node> unvisitedNeighbors = new ArrayList<Node>();
 
 			if(current.checkNeighbors(top, right, bottom, left)) {
 				// One of the neighbors is unvisited
 				if(top != null && !top.getVisited()) {
-					unvisited_neighbors.add(top);
+					unvisitedNeighbors.add(top);
 				}
 				if(right != null && !right.getVisited()) {
-					unvisited_neighbors.add(right);
+					unvisitedNeighbors.add(right);
 				}
 				if(bottom != null && !bottom.getVisited()) {
-					unvisited_neighbors.add(bottom);
+					unvisitedNeighbors.add(bottom);
 				}
 				if(left != null && !left.getVisited()) {
-					unvisited_neighbors.add(left);
+					unvisitedNeighbors.add(left);
 				}
 
-				int rand = (int) (Math.random() * unvisited_neighbors.size());
+				int rand = (int) (Math.random() * unvisitedNeighbors.size());
 				path.push(current);
 				g.setColor(Color.black);
 				Node temp = current;
-				Node removed = unvisited_neighbors.remove(rand);
+				Node removed = unvisitedNeighbors.remove(rand);
 				if(removed.equals(top)) {
 					// TOP
 					current.setTopWall(false);
@@ -196,9 +196,8 @@ public class MazeGenerator {
 				temp.drawLines(g);
 				current.drawLines(g);
 				current.setVisited(true);
-				unvisited_set_hash.remove(current);
+				unvisitedSetHash.remove(current);
 
-				TimeUnit.MILLISECONDS.sleep(2);
 			} else if(path.size() > 0) {
 				current = path.pop();
 			}

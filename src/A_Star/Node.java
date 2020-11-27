@@ -2,7 +2,6 @@ package A_Star;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.ArrayList;
 import A_Star.Node;
 
 public class Node{
@@ -22,8 +21,8 @@ public class Node{
 	boolean leftWall;
 
 	private int count;
-	private double f_score;
-	private double g_score;
+	private double fScore;
+	private double gScore;
 	private double distance;
 	private Node cameFrom;
 
@@ -37,8 +36,8 @@ public class Node{
 		this.totalRows = totalRows;	
 		this.x = (col * width);
 		this.y = (row * width);
-		this.f_score = Double.POSITIVE_INFINITY;
-		this.g_score = Double.POSITIVE_INFINITY;
+		this.fScore = Double.POSITIVE_INFINITY;
+		this.gScore = Double.POSITIVE_INFINITY;
 		this.distance = Double.POSITIVE_INFINITY;
 		this.cameFrom = null;
 		this.visited = false;
@@ -70,12 +69,12 @@ public class Node{
 		return this.y;
 	}
 
-	public double get_f_score() {
-		return this.f_score;
+	public double getfScore() {
+		return this.fScore;
 	}
 
-	public double get_g_score() {
-		return this.g_score;
+	public double getgScore() {
+		return this.gScore;
 	}
 
 	public double getDistance() {
@@ -111,19 +110,19 @@ public class Node{
 	}
 
 	// SETTERS
-	public void set_f_score(double newScore) {
-		this.f_score = newScore;
+	public void setfScore(double newScore) {
+		this.fScore = newScore;
 	}
 
-	public void set_g_score(double newScore) {
-		this.g_score = newScore;
+	public void setgScore(double newScore) {
+		this.gScore = newScore;
 	}
 
 	public void setDistance(double distance) {
 		this.distance = distance;
 	}
 
-	public void set_came_From(Node current) {
+	public void setCameFrom(Node current) {
 		this.cameFrom = current;
 	}
 
@@ -139,7 +138,7 @@ public class Node{
 
 	public boolean isStart() {
 		// is the current node the unique start node
-		return this.color == Color.blue;
+		return this.color == Color.cyan;
 	}
 
 	public boolean isPath() {
@@ -175,7 +174,7 @@ public class Node{
 
 	public void makeStart() {
 		// Change this node's color to blue
-		this.color = Color.blue;
+		this.color = Color.cyan;
 	}
 
 	public void makePath() {
@@ -281,8 +280,6 @@ public class Node{
 				// LEFT
 				this.paintModeNeighbors[3] = left;
 			}
-
-
 
 		default:
 			if(this.topWall) {

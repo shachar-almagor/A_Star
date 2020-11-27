@@ -9,14 +9,15 @@ import javax.swing.JPanel;
 
 public class Toolbar extends JPanel implements KeyListener{
 
+	private static final long serialVersionUID = 1L;
 	private Gameplay gameplay;
 	private Settings settings;
 	private Algorithms algorithms;
 
 	public Toolbar(Gameplay gameplay, Settings settings, Algorithms algorithms) {
+		this.algorithms = algorithms;
 		this.gameplay = gameplay;
 		this.settings = settings;
-		this.algorithms = algorithms;
 		this.setLayout(new BorderLayout());
 
 		setFocusable(true);
@@ -29,6 +30,10 @@ public class Toolbar extends JPanel implements KeyListener{
 
 	public Gameplay getGameplay() {
 		return this.gameplay;
+	}
+	
+	public Algorithms getAlgortihms() {
+		return this.algorithms;
 	}
 
 	@Override
@@ -52,7 +57,7 @@ public class Toolbar extends JPanel implements KeyListener{
 				}
 			} else {
 				// A*
-				gameplay.startAlgorithm();
+				algorithms.aStar(gameplay);
 			}
 		} else if(gameplay.getStart() != null && gameplay.getEnd() != null) {
 			Node current = gameplay.getCurrent();

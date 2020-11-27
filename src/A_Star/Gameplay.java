@@ -7,9 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
@@ -18,21 +15,20 @@ import A_Star.Node;
 
 public class Gameplay extends JPanel implements MouseListener, MouseMotionListener{
 
+	private static final long serialVersionUID = 1L;
 	// initial state
 	private boolean started = false;
-	private boolean isPaintMode = false;
 	private boolean leftMousePressed = false;
 	private boolean rightMousePressed = false;
 
 	private int totalRows = 50;
 	private int brickWidth;
-	private int count = 0;
-	private int delay = 0;
 
 	private Node start;
 	private Node end;
 	private Node current;
 	private Speed speed;
+	private Algorithms algs;
 
 	private CurrentAlgorithm currentAlgorithm;
 	private State state;
@@ -152,134 +148,16 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		g.drawString("to use, and press space to watch it in action.", 80, midHeight + 80);
 	}
 
-	public void startAlgorithm() {
-		if(!started && start != null && end != null) {
-			started = true;
-			// Start algorithm
-			for(int i = 0; i < totalRows; i++) {
-				for(int j = 0; j < totalRows; j++) {
-
-					Node curr = grid.get(i)[j];
-
-					Node top = curr.getRow() > 0 ? grid.get(i - 1)[j] : null;
-					Node right = curr.getCol() < curr.getTotalRows() - 1 ? grid.get(i)[j + 1] : null;
-					Node bottom = curr.getRow() < curr.getTotalRows() - 1 ? grid.get(i + 1)[j] : null;
-					Node left = curr.getCol() > 0 ? grid.get(i)[j - 1] : null;
-
-					curr.updateNeighbors(top, right, bottom, left, this);
-					curr.set_f_score(Double.POSITIVE_INFINITY);
-					curr.set_g_score(Double.POSITIVE_INFINITY);
-				}
-			}
-			Graphics g = this.getGraphics();
-			algorithm(g);
-		}
-		repaint();
-	}
-
-	public double h(Node p1, Node p2) {
-		// Measures the distance between p1 and p2 
-		int x1 = p1.getX();
-		int y1 = p1.getY();
-		int x2 = p2.getX();
-		int y2 = p2.getY();
-
-		return (Math.abs(x1 - x2) + Math.abs(y1 - y2));
-	}
-
-	public void algorithm(Graphics g){
-		PriorityQueue<Node> open_set = new PriorityQueue<Node>(5, new Comparator<Node>() {
-			@Override
-			public int compare(Node o1, Node o2) {
-				if(o1.get_f_score() < o2.get_f_score()) {
-					return -1;
-				} else if(o2.get_f_score() < o1.get_f_score()) {
-					return 1;
-				} else {
-					// The two nodes have identical f_Scores
-					if(o1.getCount() <= o2.getCount()) {
-						return -1;
-					} else if(o2.getCount() < o1.getCount()) {
-						return 1;
-					}
-				}
-				// Compilation requirement
-				return 0;
-			}
-		});
-
-		count = 0;
-		open_set.add(start);
-		start.set_g_score(0);
-		start.set_f_score(h(start, end));
-		HashSet<Node> open_set_hash = new HashSet<Node>();
-		open_set_hash.add(start);
-
-		while(!open_set.isEmpty()) {
-			try {
-				TimeUnit.MICROSECONDS.sleep(this.delay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			Node current = open_set.poll();
-			open_set_hash.remove(current);
-
-			if(current.isEnd()) {
-				// Algorithm done
-				reconstruct_path(end);
-				end.makeEnd();
-				start.makeStart();
-				break;
-			}
-			if(!current.isStart() && !current.isBarrier()) {
-				current.makeClosed();
-				open_set.remove(current);
-				open_set_hash.remove(current);
-				current.draw(g);
-				current.drawLines(g);
-			}
-			for(int i = 0; i < current.getNeighbors().length; i++) {
-				Node neighbor = this.getState() == State.Paint ? current.getPaintModeNeighbors()[i] : current.getNeighbors()[i];
-				markNeighborAStar(current, neighbor, open_set, open_set_hash);
-			}
-		}
-	}
-
-	public void markNeighborAStar(Node current, Node neighbor, PriorityQueue<Node> open_set, HashSet<Node> open_set_hash) {
-		if(neighbor != null && !neighbor.isClosed() && !neighbor.isBarrier()) {
-			// If the node is closed, disregard it
-			double temp_g_score = current.get_g_score() + 1;
-			if(temp_g_score < neighbor.get_g_score()) {
-				neighbor.set_came_From(current);
-				neighbor.set_g_score(temp_g_score);
-				neighbor.set_f_score(h(neighbor, end));
-
-				if(!open_set_hash.contains(neighbor)) {
-					count++;
-					neighbor.setCount(count);
-					open_set.add(neighbor);
-					open_set_hash.add(neighbor);
-					if(!neighbor.isEnd()) {
-						neighbor.makeOpen();
-						neighbor.drawLines(getGraphics());
-						neighbor.draw(getGraphics());
-					}
-				}
-			}
-		}
-	}
-
-	public void reconstruct_path(Node current) {
-
+	public void reconstructPath(Node current) {
+		algs = ((Toolbar) this.getParent()).getAlgortihms();
 		if(current.getCameFrom() != null) {
-			reconstruct_path(current.getCameFrom());
-			if(!current.equals(start) && !current.equals(end)) {
+			reconstructPath(current.getCameFrom());
+			if(!current.isStart() && !current.isEnd()) {
 				try {
 					if(this.currentAlgorithm == CurrentAlgorithm.Dijkstra) {
-						TimeUnit.MICROSECONDS.sleep(this.delay / 5);
+						TimeUnit.MICROSECONDS.sleep(algs.getDelay() / 5);
 					} else {
-						TimeUnit.MICROSECONDS.sleep(this.delay);
+						TimeUnit.MICROSECONDS.sleep(algs.getDelay());
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -354,14 +232,10 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		this.speed = speed;
 	}
 	
-	public int getDelay() {
-		return this.delay;
+	public Algorithms getAlgorithms() {
+		return this.algs;
 	}
 	
-	public void setDelay(int delay) {
-		this.delay = delay;
-	}
-
 	public void moveUp() {
 		current = this.grid.get(current.getRow() - 1)[current.getCol()];
 	}
@@ -457,7 +331,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 					} else if(end == null && !clicked.isStart() && !clicked.isBarrier()) {
 						clicked.makeEnd();
 						end = clicked;
-					} else if(isPaintMode && !clicked.isStart() && !clicked.isEnd() && this.state == State.Paint) {
+					} else if(!clicked.isStart() && !clicked.isEnd() && this.state == State.Paint) {
 						clicked.makeBarrier();
 					}
 				} else if(e.getButton() == 3) {

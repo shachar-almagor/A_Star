@@ -1,17 +1,18 @@
 package A_Star;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class Main {
-	
+
 	private JFrame frame;
-	
+
 	public Main() {
 		frame = new JFrame();
 		Gameplay gameplay = new Gameplay();
 		Settings settings = new Settings(frame);
 		Algorithms algorithms = new Algorithms();
-		
+
 		Toolbar toolbar = new Toolbar(gameplay, settings, algorithms);
 		int brickWidth = 800 / gameplay.getTotalRows();
 		int width = (gameplay.getTotalRows() * brickWidth) + 400;
@@ -25,7 +26,9 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		new Main();
-	}
-
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new Main();
+			}
+		});	}
 }
