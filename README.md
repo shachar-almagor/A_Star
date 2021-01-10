@@ -1,5 +1,5 @@
-# A_Star
-Visualization of common path finding algortihms
+# PathFinder
+Visualization of common pathfinding algortihms
 
 ## Running an algorithm
 Choose between the different available mazes (Zigag, Spiral or Random Maze). Use the left mouse button to create the start (Blue) and end (Orange) nodes, choose the algorithm you would like to visualize and the algorithm speed and then press the spacebar to watch it in action. You can also click the reset button to quickly clear the maze, saving only the start and end nodes.

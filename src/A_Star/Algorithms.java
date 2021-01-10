@@ -20,7 +20,7 @@ public class Algorithms {
 		Node start = gameplay.getStart();
 		start.setVisited(true);
 		queue.add(start);
-
+		
 		while(!queue.isEmpty()) {
 			try {
 				TimeUnit.MICROSECONDS.sleep(this.delay);

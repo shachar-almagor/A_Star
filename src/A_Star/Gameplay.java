@@ -140,7 +140,7 @@ public class Gameplay extends JPanel implements MouseListener, MouseMotionListen
 		g.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
 		int midHeight = this.getHeight() / 2;
 		g.setColor(Color.BLUE);
-		g.drawString("This project shows various path finding algorithms.", 80, midHeight - 80);
+		g.drawString("This project shows various pathfinding algorithms.", 80, midHeight - 80);
 		g.setColor(Color.black);
 		g.drawString("First, choose a maze.", 80, midHeight - 40);
 		g.drawString("Then, click on the grid to create the start and end nodes.", 80, midHeight);

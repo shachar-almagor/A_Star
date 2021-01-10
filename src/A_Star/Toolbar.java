@@ -64,7 +64,6 @@ public class Toolbar extends JPanel implements KeyListener{
 			Node temp = current;
 			if(!current.isEnd()) {
 				// The user hasn't finished the maze
-				// FIX - MAKE MOVING INSTANTANEOUS
 				if(key == KeyEvent.VK_UP && !current.topWall && current.getRow() > 0) {
 					// Only move up if the top wall isn't there
 					gameplay.moveUp();
